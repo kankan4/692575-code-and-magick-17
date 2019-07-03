@@ -1,35 +1,31 @@
 'use strict';
 
-var CLOUD_WIDTH = 420;
-var CLOUD_HEIGHT = 270;
-var CLOUD_X = 100;
-var CLOUD_Y = 10;
-var CLOUD_GAP_X = 20;
-var CLOUD_GAP_Y = 15;
+var Cloud = {
+  WIDTH: 420,
+  HEIGHT: 270,
+  X: 100,
+  Y: 10,
+  GAP_X: 20,
+  GAP_Y: 15
+};
+var Bar = {
+  WIDTH: 40,
+  MAX_HEIGHT: 150,
+  GAP: 50
+};
+var CHART_GAP = 30;
 var SHADOW_GAP = 10;
 var FONT_GAP = 7;
-var BAR_MAX_HEIGHT = 150;
-var BAR_WIDTH = 40;
-var BAR_GAP = 50;
-var CHART_GAP = 30;
 var FONT_SIZE = 16;
 // Максимально допустимое количество результатов - 4
 var STATISTICS_ARRAY_SIZE = 4;
 
 
-var getMaxElement = function (arr) {
-  var maxElement = arr[0];
-
-  for (var i = 1; i < arr.length; i++) {
-    if (arr[i] && (!maxElement || arr[i] > maxElement)) {
-      maxElement = arr[i];
-    }
-  }
-
-  return maxElement;
+var getMaxOfArray = function (numArray) {
+  return Math.max.apply(null, numArray);
 };
 
-// https://learn.javascript.ru/task/random-int-min-max
+// @see https://learn.javascript.ru/task/random-int-min-max
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
   rand = Math.floor(rand);
@@ -38,29 +34,29 @@ function randomInteger(min, max) {
 
 var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
-  ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
+  ctx.fillRect(x, y, Cloud.WIDTH, Cloud.HEIGHT);
 };
 
 window.renderStatistics = function (ctx, names, times) {
-  renderCloud(ctx, CLOUD_X + SHADOW_GAP, CLOUD_Y + SHADOW_GAP, 'rgba(0, 0, 0, 0.7)');
-  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
+  renderCloud(ctx, Cloud.X + SHADOW_GAP, Cloud.Y + SHADOW_GAP, 'rgba(0, 0, 0, 0.7)');
+  renderCloud(ctx, Cloud.X, Cloud.Y, '#fff');
 
   // Текст приветствия
   ctx.fillStyle = '#000';
   ctx.textBaseline = 'hanging';
   ctx.font = FONT_SIZE + 'px PT Mono';
-  ctx.fillText('Ура вы победили!', CLOUD_X + CLOUD_GAP_X, CLOUD_Y + CLOUD_GAP_Y + 5);
-  ctx.fillText('Список результатов:', CLOUD_X + CLOUD_GAP_X, CLOUD_Y + CLOUD_GAP_Y + 22);
+  ctx.fillText('Ура вы победили!', Cloud.X + Cloud.GAP_X, Cloud.Y + Cloud.GAP_Y + 5);
+  ctx.fillText('Список результатов:', Cloud.X + Cloud.GAP_X, Cloud.Y + Cloud.GAP_Y + 22);
 
   // Формирование гистограммы
-  var chartX = CLOUD_X + CLOUD_GAP_X + CHART_GAP;
-  var namesY = CLOUD_Y + CLOUD_HEIGHT - CLOUD_GAP_Y;
-  var chartY = namesY - FONT_SIZE - FONT_GAP - BAR_MAX_HEIGHT;
+  var chartX = Cloud.X + Cloud.GAP_X + CHART_GAP;
+  var namesY = Cloud.Y + Cloud.HEIGHT - Cloud.GAP_Y;
+  var chartY = namesY - FONT_SIZE - FONT_GAP - Bar.MAX_HEIGHT;
   var timesY = chartY - FONT_GAP;
 
   names = names.splice(0, STATISTICS_ARRAY_SIZE);
   times = times.splice(0, STATISTICS_ARRAY_SIZE);
-  var maxTime = getMaxElement(times);
+  var maxTime = getMaxOfArray(times);
 
   ctx.textBaseline = 'bottom';
   for (var i = 0; i < names.length; i++) {
@@ -71,12 +67,12 @@ window.renderStatistics = function (ctx, names, times) {
       var colorSaturation = randomInteger(0, 255);
       ctx.fillStyle = 'rgba(0, 0, ' + colorSaturation + ', 1)';
     }
-    var barHeight = BAR_MAX_HEIGHT * times[i] / maxTime;
-    ctx.fillRect(chartX + (BAR_WIDTH + BAR_GAP) * i, chartY + BAR_MAX_HEIGHT - barHeight, BAR_WIDTH, barHeight);
+    var barHeight = Bar.MAX_HEIGHT * times[i] / maxTime;
+    ctx.fillRect(chartX + (Bar.WIDTH + Bar.GAP) * i, chartY + Bar.MAX_HEIGHT - barHeight, Bar.WIDTH, barHeight);
 
     // Добавление текста
     ctx.fillStyle = '#000';
-    ctx.fillText(Math.round(times[i]), chartX + (BAR_WIDTH + BAR_GAP) * i, timesY + BAR_MAX_HEIGHT - barHeight);
-    ctx.fillText(names[i], chartX + (BAR_WIDTH + BAR_GAP) * i, namesY);
+    ctx.fillText(Math.round(times[i]), chartX + (Bar.WIDTH + Bar.GAP) * i, timesY + Bar.MAX_HEIGHT - barHeight);
+    ctx.fillText(names[i], chartX + (Bar.WIDTH + Bar.GAP) * i, namesY);
   }
 };
